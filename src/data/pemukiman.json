@@ -1,0 +1,16 @@
+[
+  { "nama": "Desa Tanjung Asri",      "lat": -2.190, "lon": 113.800, "kelasPopulasi": "sedang", "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "SDN 1 Tanjung Asri",     "lat": -2.195, "lon": 113.805, "kelasPopulasi": "kecil",  "tipe": "sekolah", "sumber": "Data ilustrasi" },
+  { "nama": "Desa Sei Lembah",        "lat": -2.240, "lon": 113.870, "kelasPopulasi": "besar",  "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Puskesmas Sei Lembah",   "lat": -2.236, "lon": 113.875, "kelasPopulasi": "kecil",  "tipe": "faskes",  "sumber": "Data ilustrasi" },
+  { "nama": "Desa Karang Jaya",       "lat": -2.300, "lon": 113.920, "kelasPopulasi": "sedang", "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "SMPN 2 Karang Jaya",     "lat": -2.305, "lon": 113.925, "kelasPopulasi": "kecil",  "tipe": "sekolah", "sumber": "Data ilustrasi" },
+  { "nama": "Desa Bukit Harapan",     "lat": -2.345, "lon": 113.840, "kelasPopulasi": "kecil",  "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Puskesmas Bukit Harapan","lat": -2.350, "lon": 113.845, "kelasPopulasi": "kecil",  "tipe": "faskes",  "sumber": "Data ilustrasi" },
+  { "nama": "Desa Pulau Mekar",       "lat": -2.260, "lon": 113.750, "kelasPopulasi": "sedang", "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Desa Rawa Indah",        "lat": -2.150, "lon": 113.930, "kelasPopulasi": "kecil",  "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Desa Batu Tinggi",       "lat": -2.210, "lon": 114.000, "kelasPopulasi": "besar",  "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Desa Telaga Biru",       "lat": -2.270, "lon": 113.990, "kelasPopulasi": "sedang", "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Desa Muara Sari",        "lat": -2.380, "lon": 113.970, "kelasPopulasi": "kecil",  "tipe": "desa",    "sumber": "Data ilustrasi" },
+  { "nama": "Desa Lubuk Padi",        "lat": -2.120, "lon": 113.870, "kelasPopulasi": "sedang", "tipe": "desa",    "sumber": "Data ilustrasi" }
+]

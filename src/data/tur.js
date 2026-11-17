@@ -1,0 +1,23 @@
+// Langkah tur terpandu di halaman Peta (Indonesia + Inggris). `selector` menunjuk elemen dengan atribut data-tur.
+export const LANGKAH_TUR = [
+  { selector: '[data-tur="layer"]', judul: 'Peta dan layer',
+    isi: 'Titik merah berdenyut adalah hotspot (data demo). Klik satu titik untuk melihat detailnya. Nyalakan atau matikan layer di bilah ini.',
+    en: { judul: 'Map and layers', isi: 'Pulsing red dots are hotspots (demo data). Click a dot to see its details. Turn layers on or off in this bar.' } },
+  { selector: '[data-tur="panel"]', judul: 'Jalankan simulasi',
+    isi: 'Pilih titik api lalu tekan "Jalankan simulasi". Tiga zona muncul untuk 3, 6, dan 12 jam dengan pola garis berbeda agar mudah dibedakan. Geser slider waktu untuk melihat api merambat.',
+    en: { judul: 'Run the simulation', isi: 'Pick a fire point, then press "Run simulation". Three zones appear for 3, 6, and 12 hours with different line patterns so they are easy to tell apart. Drag the time slider to watch the fire spread.' } },
+  { selector: '[data-tur="angin"]', judul: 'Skenario angin (what-if)',
+    isi: 'Putar kompas atau ubah kecepatan angin. Zona di peta langsung berubah tanpa menekan tombol apa pun.',
+    en: { judul: 'Wind scenario (what-if)', isi: 'Turn the compass or change the wind speed. The zones on the map change instantly, with no button to press.' } },
+  { selector: '[data-tur="risiko"]', judul: 'Pemukiman terancam',
+    isi: 'Desa, sekolah, dan fasilitas kesehatan di dalam zona diurutkan menurut skor risiko. Klik satu untuk memusatkan peta. Ikon i menjelaskan cara skor dihitung.',
+    en: { judul: 'Settlements at risk', isi: 'Villages, schools, and health facilities inside the zones are ranked by risk score. Click one to center the map. The i icon explains how the score is calculated.' } },
+  { selector: '[data-tur="prioritas-tombol"]', judul: 'Prioritas penanganan',
+    isi: 'Tombol Prioritas memberi nomor urut pada tiap hotspot dari skor penduduk, jangkauan simulasi, curah hujan, lahan, angin, dan keyakinan. Atur bobotnya sendiri; hujan dan penduduk masih data ilustrasi.',
+    en: { judul: 'Response priority', isi: 'The Priority button numbers each hotspot from a score of population, simulated reach, rainfall, land type, wind, and confidence. Set the weights yourself; rainfall and population are still illustrative data.' } },
+  { selector: '[data-tur="lapor"]', judul: 'Lapor tanpa sinyal',
+    isi: 'Petugas lapangan dapat membuat laporan saat offline di halaman Lapor. Laporan tersimpan di perangkat dan terkirim otomatis saat kembali online.',
+    tautan: { ke: '/lapor', label: 'Buka halaman Lapor' },
+    en: { judul: 'Report without signal', isi: 'Field officers can file a report while offline on the Report page. Reports are saved on the device and sent automatically when back online.',
+      tautan: { ke: '/lapor', label: 'Open the Report page' } } },
+]

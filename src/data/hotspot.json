@@ -1,0 +1,12 @@
+[
+  { "id": "H-01", "curahHujan7h": 12, "lat": -2.185, "lon": 113.842, "confidence": "high",    "acq_datetime": "2026-09-14T06:30:00Z", "sumber": "Data demo", "angin": { "U": 4, "theta": 110 }, "jenisLahan": "semak" },
+  { "id": "H-02", "curahHujan7h": 8, "lat": -2.236, "lon": 113.911, "confidence": "nominal", "acq_datetime": "2026-09-14T06:30:00Z", "sumber": "Data demo", "angin": { "U": 3, "theta": 100 }, "jenisLahan": "gambut" },
+  { "id": "H-03", "curahHujan7h": 20, "lat": -2.301, "lon": 113.955, "confidence": "high",    "acq_datetime": "2026-09-14T06:32:00Z", "sumber": "Data demo", "angin": { "U": 6, "theta": 125 }, "jenisLahan": "semak" },
+  { "id": "H-04", "curahHujan7h": 55, "lat": -2.152, "lon": 113.968, "confidence": "low",     "acq_datetime": "2026-09-14T06:32:00Z", "sumber": "Data demo", "angin": { "U": 2, "theta": 90  }, "jenisLahan": "hutan" },
+  { "id": "H-05", "curahHujan7h": 30, "lat": -2.268, "lon": 114.034, "confidence": "nominal", "acq_datetime": "2026-09-14T06:35:00Z", "sumber": "Data demo", "angin": { "U": 5, "theta": 135 }, "jenisLahan": "pertanian" },
+  { "id": "H-06", "curahHujan7h": 15, "lat": -2.341, "lon": 113.872, "confidence": "high",    "acq_datetime": "2026-09-14T06:35:00Z", "sumber": "Data demo", "angin": { "U": 7, "theta": 120 }, "jenisLahan": "semak" },
+  { "id": "H-07", "curahHujan7h": 48, "lat": -2.121, "lon": 113.905, "confidence": "nominal", "acq_datetime": "2026-09-14T06:38:00Z", "sumber": "Data demo", "angin": { "U": 3, "theta": 95  }, "jenisLahan": "hutan" },
+  { "id": "H-08", "curahHujan7h": 6, "lat": -2.205, "lon": 114.082, "confidence": "low",     "acq_datetime": "2026-09-14T06:38:00Z", "sumber": "Data demo", "angin": { "U": 4, "theta": 105 }, "jenisLahan": "gambut" },
+  { "id": "H-09", "curahHujan7h": 25, "lat": -2.389, "lon": 114.011, "confidence": "nominal", "acq_datetime": "2026-09-14T06:40:00Z", "sumber": "Data demo", "angin": { "U": 5, "theta": 130 }, "jenisLahan": "semak" },
+  { "id": "H-10", "curahHujan7h": 10, "lat": -2.255, "lon": 113.783, "confidence": "high",    "acq_datetime": "2026-09-14T06:40:00Z", "sumber": "Data demo", "angin": { "U": 6, "theta": 115 }, "jenisLahan": "gambut" }
+]

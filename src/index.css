@@ -1,0 +1,676 @@
+@import "tailwindcss";
+
+/* Token Ember & Canopy: semua warna komponen lewat variabel ini */
+:root, [data-theme="light"] {
+  /* Kertas hangat, tinta hutan. Kartu putih-gading terangkat dari alas; oranye hanya untuk api. */
+  --bg: #F4F0E7; --surface: #FCFAF5; --border: #D8D1C2;
+  --text: #14211B; --text-2: #4F5A53;
+  --ember: #CF450D; --flame: #C02427; --amber: #8A5F00;
+  --canopy: #1F5C45; --mint: #236B49;
+  --ember-ink: #B8380A; --on-ember: #FFFFFF; --foto-latar: 0.16;
+  /* 60-30-10: 60% kertas (bg, surface) · 30% hutan (band sage, forest) · 10% api (ember) */
+  --band: #E5EADD; --line-strong: #82857A;
+}
+[data-theme="dark"] {
+  /* Arang hutan: hijau pinus gelap, bukan hitam netral */
+  --bg: #09110D; --surface: #101A15; --border: #22332A;
+  --text: #E7EEE8; --text-2: #97A99E;
+  --ember: #FF6B2C; --flame: #F65C5E; --amber: #FFB703;
+  --canopy: #3E9A73; --mint: #7BD3A9;
+  --ember-ink: #FF7A3D; --on-ember: #09110D; --foto-latar: 0.34;
+  --band: #12281D; --line-strong: #6B8176;
+}
+/* Rel mendatar About: hanya bila layar cukup lebar dan cukup tinggi; selain itu kartu ditumpuk ke bawah */
+@custom-variant rel (@media (min-width: 1024px) and (min-height: 700px));
+
+@custom-variant short (@media (max-height: 860px));
+
+@theme inline {
+  --color-bg: var(--bg); --color-surface: var(--surface); --color-line: var(--border);
+  --color-ink: var(--text); --color-ink-2: var(--text-2);
+  --color-ember: var(--ember); --color-flame: var(--flame); --color-amber: var(--amber);
+  --color-canopy: var(--canopy); --color-mint: var(--mint);
+  --color-ember-ink: var(--ember-ink); --color-on-ember: var(--on-ember);
+  --color-band: var(--band); --color-line-strong: var(--line-strong);
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+/* Gerak: kurva kuat untuk UI (ease-out), ease-in-out hanya untuk gerak di layar. Jangan pakai ease-in. */
+@theme {
+  --ease-snap: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Eyebrow (label kecil di atas judul): satu gaya di seluruh situs, mono huruf kapital berjarak lebar, oranye tinta */
+@layer components {
+  .alis { font-family: var(--font-mono); font-size: 0.75rem; line-height: 1rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ember-ink); }
+}
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3 { font-family: var(--font-display); font-stretch: 76%; font-weight: 800; letter-spacing: -0.015em; text-wrap: balance; }
+p { text-wrap: pretty; }
+.angka { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid var(--ember-ink); outline-offset: 2px; border-radius: 4px; }
+.sin-cincin:focus-visible { outline: none; } /* judul yang hanya menerima fokus lewat program */
+/* Satu momen gerak di halaman: zona api menyebar keluar dari titik api (3 jam, lalu 6, lalu 12). Hanya saat dimuat. */
+@keyframes putar { to { transform: rotate(360deg); } }
+@keyframes jarum { from { rotate: -90deg; } }
+@keyframes coret { from { stroke-dashoffset: 30; } }
+.coret { stroke-dasharray: 30; animation: coret .5s var(--ease-snap) both; animation-delay: calc(700ms + var(--j, 0) * 130ms); }
+.bentuk-putar { animation: putar 36s linear infinite; }
+.group:hover .bentuk-putar { animation-duration: 6s; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .bentuk-putar { animation: none !important; } }
+html[data-gerak="hemat"] .bentuk-putar, html[data-gerak="hemat"] .sebar { animation: none !important; opacity: var(--o, 1); }
+@keyframes tile-masuk { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+@keyframes sebar { from { opacity: 0; transform: scale(0.4); } }
+.zona-masuk { animation: sebar 800ms var(--ease-snap) both; animation-delay: calc(var(--j, 0) * 150ms + 200ms); }
+@keyframes cincin { to { transform: scale(3); opacity: 0; } }
+.titik-api-cincin { animation: cincin 2.4s var(--ease-snap) infinite; }
+.garis-indeks { transform: scaleY(0); transform-origin: bottom; transition: transform 220ms var(--ease-snap); }
+.baris-indeks:hover .garis-indeks, .baris-indeks:focus-visible .garis-indeks { transform: scaleY(1); }
+
+@keyframes napas { 50% { opacity: 0.45; } }
+.napas { animation: napas 3.2s ease-in-out infinite; }
+@keyframes kirim { from { left: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { left: calc(100% - 7px); opacity: 0; } }
+.kirim { animation: kirim 2.4s var(--ease-snap) infinite; }
+.rv { opacity: 0; translate: 0 22px; }
+.rv.rv-in { opacity: 1; translate: 0 0; transition: opacity 700ms var(--ease-snap) var(--d, 0ms), translate 700ms var(--ease-snap) var(--d, 0ms); }
+.baris-indeks::before, [data-spot]::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 250ms var(--ease-snap);
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--ember) 16%, transparent), transparent 70%); }
+.baris-indeks:hover::before, [data-spot]:hover::before { opacity: 1; }
+[data-spot] { position: relative; }
+.baris-indeks > span:last-child { transition: translate 250ms var(--ease-snap); }
+.baris-indeks:hover > span:last-child { translate: 6px 0; }
+[data-mag] { transition-property: background-color, border-color, color, filter, transform, translate; }
+
+/* Gerak dikurangi: animasi selesai seketika dan TIDAK berulang (perulangan tak berujung pada .01ms justru berkedip) */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-gerak="penuh"]) *, html:not([data-gerak="penuh"]) *::before, html:not([data-gerak="penuh"]) *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+html[data-gerak="hemat"] *, html[data-gerak="hemat"] *::before, html[data-gerak="hemat"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+
+/* Peta: hotspot berdenyut, pemukiman, basemap cadangan, tema gelap */
+.hotspot-dot { display: block; position: relative; margin: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--flame); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--flame); }
+.hotspot-dot::after { content: ""; position: absolute; inset: -2px; border-radius: 50%;
+  border: 2px solid var(--flame); animation: denyut 1.8s ease-out infinite; }
+.hotspot-dot.aktif { background: var(--ember); box-shadow: 0 0 0 3px var(--text); }
+/* Mode prioritas: lencana bernomor */
+.hotspot-dot.prio { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  font: 800 13px/1 var(--font-mono); color: var(--on-ember); box-shadow: 0 2px 8px rgb(0 0 0 / .35); }
+.hotspot-dot.prio::after { display: none; }
+.hotspot-dot.prio-utama { background: var(--ember-ink); border-color: var(--surface); }
+.hotspot-dot.prio-utama::after { display: block; inset: -3px; border-color: var(--ember-ink); }
+.hotspot-dot.prio-sedang { background: var(--amber); color: var(--bg); }
+.hotspot-dot.prio-pantau { background: var(--surface); color: var(--text); box-shadow: 0 0 0 2px var(--text-2), 0 2px 8px rgb(0 0 0 / .3); }
+.hotspot-dot.prio.aktif { box-shadow: 0 0 0 3px var(--text), 0 2px 8px rgb(0 0 0 / .4); }
+@keyframes denyut { to { transform: scale(2.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hotspot-dot::after, .titik-api-cincin { animation: none; } }
+.pem-dot { stroke: var(--surface); fill: var(--canopy); }
+/* Titik panas nyata SiPongi: kecil, tanpa denyut, bertepi kontras tema — beda bentuk dari hotspot demo yang besar & berdenyut */
+.sipongi-dot { fill: var(--ember); stroke: var(--text); }
+.basemap-cadangan { fill: var(--surface); stroke: var(--text-2); }
+/* div. menaikkan spesifisitas: leaflet.css dimuat belakangan (chunk peta) dan memasang abu-abu #ddd bawaan */
+div.leaflet-container { background: var(--bg); font-family: var(--font-sans); }
+.peta-gelap .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.95); }
+
+/* Zona prediksi: warna + pola garis berbeda agar terbaca tanpa bergantung warna */
+.zona-3  { fill: var(--flame); fill-opacity: .45; stroke: var(--flame); stroke-width: 2; }
+.zona-6  { fill: var(--ember); fill-opacity: .35; stroke: var(--ember); stroke-width: 2; stroke-dasharray: 8 6; }
+.zona-12 { fill: var(--amber); fill-opacity: .25; stroke: var(--amber); stroke-width: 3; stroke-dasharray: 1 7; stroke-linecap: round; }
+.zona-t  { fill: none; stroke: var(--text); stroke-width: 3.5; }
+
+/* Pemukiman: warna menurut kategori risiko, dan penanda terpilih */
+.pem-dot.pem-kritis  { fill: var(--flame); }
+.pem-dot.pem-tinggi  { fill: var(--ember); }
+.pem-dot.pem-waspada { fill: var(--amber); }
+.pem-dot.pem-aktif   { stroke: var(--text); stroke-width: 4; }
+
+/* Api pada ilustrasi hero bergoyang halus */
+.api-goyang { animation: goyang 3s ease-in-out infinite; }
+@keyframes goyang { 50% { transform: scale(1.03, 0.97) rotate(-1deg); } }
+@media (prefers-reduced-motion: reduce) { .api-goyang { animation: none; } }
+
+/* Laporan lapangan tersinkron di peta */
+.lap-dot { fill: var(--mint); stroke: var(--text); }
+
+/* Cetak: hanya area checklist yang dicetak */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+  .no-print { display: none !important; }
+  .rv { opacity: 1 !important; translate: none !important; }
+}
+
+/* Hero 3D: selalu "malam", apa pun tema halaman. Token di sini hanya berlaku di dalam .hero-malam. */
+.hero-malam { --bg: #060C09; --surface: #0E1813; --border: #24362C; --text: #E8EFE9; --text-2: #A3B5A9;
+  --ember-ink: #FF7A3D; --on-ember: #060C09; --amber: #FFB703; --ember: #FF6B2C; --flame: #F0484A; --canopy: #3E9A73; --mint: #7BD3A9; background: var(--bg); color: var(--text); }
+/* Hutan: permukaan 30% yang sama di dua tema (hijau pinus pekat). Token teks/aksen disetel ulang agar kontras tetap >= 4,5:1 di atasnya. */
+.hutan { --line-strong: #7FA593; --bg: #1A382C; --surface: #224536; --border: #3A5F50; --text: #EAF0E8; --text-2: #B4C7BA;
+  --ember: #FF7A3D; --ember-ink: #FF8A50; --on-ember: #0B1510; --amber: #FFB703; --flame: #FF8E90; --canopy: #7BD3A9; --mint: #9BE0BD; background: var(--bg); color: var(--text); }
+/* Sama dengan .hero-malam tetapi tanpa latar: untuk halaman dengan adegan 3D tetap di belakang seluruh isi */
+.malam-token { --bg: #060C09; --surface: #0E1813; --border: #24362C; --text: #E8EFE9; --text-2: #A3B5A9;
+  --ember-ink: #FF7A3D; --on-ember: #060C09; --amber: #FFB703; --ember: #FF6B2C; --flame: #F0484A; --canopy: #3E9A73; --mint: #7BD3A9; color: var(--text); }
+.label-peta { position: absolute; left: 0; top: 0; white-space: nowrap; font-size: 12px; font-weight: 600; line-height: 1;
+  padding: 4px 7px; color: var(--text); background: color-mix(in oklab, var(--surface) 78%, transparent);
+  border-left: 2px solid var(--flame); backdrop-filter: blur(6px); will-change: transform; }
+.label-tenang { border-left-color: var(--text-2); font-weight: 500; opacity: .85; }
+
+/* Progres auto-ganti tab pada PilarFitur */
+@keyframes isi-progres { from { scale: 0 1; } to { scale: 1 1; } }
+.isi-progres { animation: isi-progres 6s linear forwards; }
+.group\/it:hover .isi-progres, .group\/it:focus-within .isi-progres { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .isi-progres { animation: none; scale: 1 1; } }
+
+.judul-display { font-family: var(--font-display); font-stretch: 76%; font-weight: 800; letter-spacing: -0.015em; text-wrap: balance; }
+
+/* Peta sebaran di PilarFitur: sel menyala bertahap per rentang jam, mengulang tiap 9 dtk */
+.sebar { transform-box: fill-box; transform-origin: center; animation-duration: 9s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(.2,.8,.2,1); animation-fill-mode: both; }
+.sebar-3 { animation-name: sebar-3; } .sebar-6 { animation-name: sebar-6; } .sebar-12 { animation-name: sebar-12; }
+@keyframes sebar-3 { 0%,4% { opacity: 0; scale: .3; } 12%,88% { opacity: var(--o, 1); scale: 1; } 96%,100% { opacity: 0; scale: .3; } }
+@keyframes sebar-6 { 0%,20% { opacity: 0; scale: .3; } 32%,88% { opacity: var(--o, 1); scale: 1; } 96%,100% { opacity: 0; scale: .3; } }
+@keyframes sebar-12 { 0%,40% { opacity: 0; scale: .3; } 55%,88% { opacity: var(--o, 1); scale: 1; } 96%,100% { opacity: 0; scale: .3; } }
+@media (prefers-reduced-motion: reduce) { .sebar { animation: none; opacity: var(--o, 1); } }
+
+@keyframes goyang { 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
+
+/* Nyala api pada kartu keparahan terpilih (selalu dipakai dengan motion-safe:) */
+@keyframes api-kedip { 0%,100% { transform: scale(1) rotate(0deg); } 30% { transform: scale(1.08,1.14) rotate(-4deg); } 62% { transform: scale(.96,1.05) rotate(3deg); } }
+
+/* Lapor: gerak mikro. Semua yang berulang dimatikan saat gerak dihemat. */
+@keyframes percik { from { opacity: 1; transform: rotate(var(--a)) translateX(14px) scale(1); } to { opacity: 0; transform: rotate(var(--a)) translateX(58px) scale(0.2); } }
+.percik { animation: percik .7s var(--ease-snap) both; animation-delay: calc(var(--k, 0) * 18ms); }
+@keyframes pop { 0% { transform: scale(0.6); } 55% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes cuci { from { filter: blur(10px) brightness(2.4) saturate(0); scale: 1.12; } to { filter: none; scale: 1; } }
+@keyframes kilau-geser { from { translate: -130% 0; } 55%, to { translate: 130% 0; } }
+.kilau { position: relative; overflow: hidden; }
+.kilau::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / .38) 50%, transparent 65%); animation: kilau-geser 2.8s var(--ease-snap) infinite; }
+@keyframes sapu { to { transform: rotate(360deg); } }
+.sapu { animation: sapu 2.2s linear infinite; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .kilau::after, html:not([data-gerak="penuh"]) .sapu { animation: none !important; } }
+html[data-gerak="hemat"] .kilau::after, html[data-gerak="hemat"] .sapu { animation: none !important; }
+
+/* Kontak: cap pos yang "menghantam" saat topik diganti */
+@keyframes stempel { from { opacity: 0; transform: scale(2.4) rotate(-28deg); } 55% { opacity: 1; transform: scale(0.9) rotate(15deg); } to { opacity: 1; transform: scale(1) rotate(12deg); } }
+
+/* Kontak: percakapan */
+@keyframes gelembung-kiri { from { opacity: 0; transform: translateY(14px) scale(0.86); } to { opacity: 1; transform: none; } }
+@keyframes gelembung-kanan { from { opacity: 0; transform: translateY(14px) scale(0.86); } to { opacity: 1; transform: none; } }
+.gelembung-kiri { transform-origin: 0 100%; animation: gelembung-kiri .5s var(--ease-snap) both; }
+.gelembung-kanan { transform-origin: 100% 100%; animation: gelembung-kanan .45s var(--ease-snap) both; }
+@keyframes ketik { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-5px); opacity: 1; } }
+.ketik-titik { animation: ketik 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .gelembung-kiri, html:not([data-gerak="penuh"]) .gelembung-kanan, html:not([data-gerak="penuh"]) .ketik-titik { animation: none !important; } }
+html[data-gerak="hemat"] .gelembung-kiri, html[data-gerak="hemat"] .gelembung-kanan, html[data-gerak="hemat"] .ketik-titik { animation: none !important; }
+
+/* Peta: aliran angin pada kompas (kecepatan lewat --dur) dan sapuan panah arah */
+@keyframes angin-alir { 0% { translate: 0 -26px; opacity: 0 } 25% { opacity: .85 } 100% { translate: 0 26px; opacity: 0 } }
+.angin-alir { animation: angin-alir var(--dur, 1.6s) linear infinite; }
+@media (prefers-reduced-motion: reduce) { .angin-alir { animation: none; opacity: .5; } }
+html[data-gerak="hemat"] .angin-alir { animation: none; opacity: .5; }
+
+/* Gerakan & sentuhan: gulir halus, tanpa kilat tap, umpan balik tekan, transisi halaman/panel */
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+a, button, [role="button"], [role="tab"], summary, label, select { touch-action: manipulation; }
+dialog, aside[data-tur="panel"] { overscroll-behavior: contain; }
+@keyframes halaman-masuk { from { opacity: 0; } }
+.halaman-masuk { animation: halaman-masuk 380ms var(--ease-snap) backwards; }
+@keyframes menu-turun { from { opacity: 0; translate: 0 -8px; } }
+.menu-turun { animation: menu-turun 260ms var(--ease-snap) both; }
+@keyframes sheet-naik { from { opacity: 0; translate: 0 28px; } }
+@keyframes lb-ganti { from { opacity: 0; scale: 0.985; } }
+.lb-ganti { animation: lb-ganti 320ms var(--ease-snap) both; }
+@media (max-width: 767px) { .sheet-naik { animation: sheet-naik 380ms var(--ease-snap) both; } }
+@media (hover: none) and (pointer: coarse) {
+  :where(a, button, [role="tab"], [role="button"]):active { scale: 0.97; transition: scale 90ms var(--ease-snap); }
+}
+html[data-gerak="hemat"] { scroll-behavior: auto; }
+html[data-gerak="hemat"] .halaman-masuk, html[data-gerak="hemat"] .menu-turun, html[data-gerak="hemat"] .sheet-naik, html[data-gerak="hemat"] .lb-ganti { animation: none; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) { scroll-behavior: auto; } }
+
+/* Bilah gulir disembunyikan di panel peta; tetap bisa digulir (roda, sentuh, keyboard) */
+.sembunyi-gulir { scrollbar-width: none; -ms-overflow-style: none; }
+.sembunyi-gulir::-webkit-scrollbar { display: none; }
+
+/* Akun: cincin kesiapan terisi dari kosong */
+@keyframes cincin-isi { from { stroke-dashoffset: 100; } }
+.cincin-isi { animation: cincin-isi 1.3s var(--ease-snap) 150ms both; }
+
+/* Interaksi tambahan: dialog, toast, panel tab, percik kecil */
+@keyframes percik-kecil { from { opacity: 1; transform: rotate(var(--a)) translateX(4px) scale(1); } to { opacity: 0; transform: rotate(var(--a)) translateX(26px) scale(0.2); } }
+.percik-kecil { animation: percik-kecil .6s var(--ease-snap) both; animation-delay: calc(var(--k, 0) * 12ms); }
+/* Percik saat TORA diketuk: butir lebih besar dan bertahan lebih lama agar terlihat di langit gelap/terang */
+.percik-tora .percik-kecil { width: 0.375rem; height: 0.375rem; animation-duration: 1.1s; animation-timing-function: cubic-bezier(.2,.7,.3,1); }
+@keyframes dialog-masuk { from { opacity: 0; translate: 0 14px; scale: 0.97; } }
+@keyframes latar-masuk { from { opacity: 0; } }
+dialog[open] { animation: dialog-masuk 320ms var(--ease-snap) backwards; }
+dialog[open]::backdrop { animation: latar-masuk 320ms ease-out backwards; }
+@keyframes toast-masuk { from { opacity: 0; translate: 24px 0; scale: 0.96; } }
+.toast-masuk { animation: toast-masuk 360ms var(--ease-snap) backwards; }
+@keyframes toast-keluar { to { opacity: 0; translate: 0 10px; scale: 0.96; } }
+.toast-keluar { animation: toast-keluar 220ms cubic-bezier(.4,0,1,1) forwards; pointer-events: none; }
+@keyframes toast-waktu { from { scale: 1 1; } to { scale: 0 1; } }
+.toast-waktu { animation-name: toast-waktu; animation-timing-function: linear; animation-fill-mode: forwards; }
+/* Di admin ponsel ada bilah tab di bawah: toast naik di atasnya */
+/* Tombol kembali-ke-atas sedang tampil: toast naik di atasnya */
+body:has(.ke-atas-tampil) .tumpuk-toast { bottom: 5rem; }
+@media (max-width: 1023.98px) { body:has(#rel-admin) .tumpuk-toast { bottom: calc(4.5rem + env(safe-area-inset-bottom)); } }
+@keyframes admin-masuk { from { opacity: 0; translate: 0 10px; } }
+.admin-masuk { animation: admin-masuk 420ms var(--ease-snap) backwards; }
+@keyframes baris-masuk-halus { from { opacity: 0; translate: 0 8px; } }
+.baris-masuk-halus { animation: baris-masuk-halus 460ms var(--ease-snap) backwards; }
+@keyframes tab-ganti { from { opacity: 0; translate: 0 8px; } }
+.tab-ganti { animation: tab-ganti 340ms var(--ease-snap) backwards; }
+html[data-gerak="hemat"] dialog[open], html[data-gerak="hemat"] dialog[open]::backdrop, html[data-gerak="hemat"] .toast-masuk, html[data-gerak="hemat"] .toast-keluar, html[data-gerak="hemat"] .toast-waktu, html[data-gerak="hemat"] .admin-masuk, html[data-gerak="hemat"] .baris-masuk-halus, html[data-gerak="hemat"] .tab-ganti, html[data-gerak="hemat"] .percik-kecil { animation: none; }
+
+/* Penanda jam di ujung zona sebaran (peta): titik, garis penuntun, label; muncul setelah zonanya menyebar */
+.zl-ikon { pointer-events: none; }
+.zl { position: absolute; left: 0; top: 0; display: block; animation: zl-masuk 520ms var(--ease-snap) both; animation-delay: var(--d, 0ms); }
+.zl-titik { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 9999px; background: var(--c); box-shadow: 0 0 0 2px var(--surface); }
+.zl-garis { position: absolute; left: -0.5px; top: -30px; width: 1px; height: 28px; background: var(--c); }
+.zl-teks { position: absolute; left: 0; top: -50px; translate: -50% 0; white-space: nowrap; font: 600 12px/1 var(--font-mono, ui-monospace, monospace); color: var(--text); text-shadow: 0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 6px var(--surface); }
+@keyframes zl-masuk { from { opacity: 0; translate: 0 8px; } }
+html[data-gerak="hemat"] .zl { animation: none; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .zl { animation: none; } }
+
+/* Batang grafik tumbuh dari dasar */
+@keyframes bar-tumbuh { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.bar-tumbuh { transform-origin: bottom; animation: bar-tumbuh 0.7s var(--ease-snap, cubic-bezier(0.2, 0.8, 0.2, 1)) backwards; }
+@media (prefers-reduced-motion: reduce) { .bar-tumbuh { animation: none; } }
+html[data-gerak="hemat"] .bar-tumbuh { animation: none; }
+
+/* Garis grafik tergambar dari kiri ke kanan */
+@keyframes garis-gambar { from { stroke-dasharray: 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1; stroke-dashoffset: 0; } }
+.garis-gambar { animation: garis-gambar 1.2s var(--ease-snap, cubic-bezier(0.2, 0.8, 0.2, 1)) backwards; }
+@media (prefers-reduced-motion: reduce) { .garis-gambar { animation: none; } }
+html[data-gerak="hemat"] .garis-gambar { animation: none; }
+
+/* Isi-otomatis browser: tanpa kotak biru; warna teks dan latar mengikuti tema */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text); caret-color: var(--text);
+  box-shadow: 0 0 0 1000px var(--surface) inset; -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+input:autofill { -webkit-text-fill-color: var(--text); box-shadow: 0 0 0 1000px var(--surface) inset; }
+
+/* --w dapat dianimasikan: warna panel tingkat keparahan berpindah halus */
+@property --w { syntax: '<color>'; inherits: true; initial-value: transparent; }
+
+/* Penggaris satu menit di hero Edukasi: terisi dari kiri, kepala penunjuk ikut bergerak */
+@keyframes penggaris-isi { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes penggaris-kepala { from { left: 0; } to { left: calc(100% - 2px); } }
+.penggaris-isi { animation: penggaris-isi 3.2s cubic-bezier(0.3, 0.7, 0.2, 1) 0.4s backwards; }
+.penggaris-kepala { animation: penggaris-kepala 3.2s cubic-bezier(0.3, 0.7, 0.2, 1) 0.4s both; }
+@media (prefers-reduced-motion: reduce) { .penggaris-isi { animation: none; } .penggaris-kepala { animation: none; left: calc(100% - 2px); } }
+html[data-gerak="hemat"] .penggaris-isi { animation: none; }
+html[data-gerak="hemat"] .penggaris-kepala { animation: none; left: calc(100% - 2px); }
+
+/* Peralihan tema lewat View Transitions: pemudaran dua tangkapan layar (GPU), bukan transisi di setiap elemen */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 320ms; animation-timing-function: var(--ease-snap); }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+
+/* Sorotan butir tujuan setelah pindah dari pencarian admin: garis tepi yang memudar */
+@keyframes sorot { 0%, 55% { outline-color: var(--ember-ink); } 100% { outline-color: transparent; } }
+.sorot { outline: 3px solid var(--ember-ink); outline-offset: 3px; border-radius: 1rem; animation: sorot 2.2s ease-out forwards; }
+
+/* Maskot TORA: gambar lengkap memudar di tepi bawah agar tidak terpotong keras */
+.maskot-badan { -webkit-mask-image: linear-gradient(to bottom, black 84%, transparent); mask-image: linear-gradient(to bottom, black 84%, transparent); }
+
+/* Halaman Lapor: tema gelap berlatar hitam polos (tanpa semburat hijau). Diset lewat data-halaman pada <html> oleh Lapor.jsx. */
+[data-theme="dark"][data-halaman="lapor"] { --bg: #000000; --surface: #0A0A0A; --border: #2A2D2B; --band: #000000; --line-strong: #707672; }
+[data-theme="dark"][data-halaman="lapor"] .hero-malam { --bg: #000000; --surface: #0A0A0A; --border: #2A2D2B; }
+
+/* Form Lapor: centang yang muncul dengan membal kecil, dan denyut sinyal saat GPS mencari */
+@keyframes pop-cek { 0% { scale: 0.4; opacity: 0; } 70% { scale: 1.2; opacity: 1; } 100% { scale: 1; } }
+.pop-cek { animation: pop-cek 320ms var(--ease-snap) both; }
+@keyframes ping-gps { from { scale: 0.1; opacity: 0.7; } to { scale: 1; opacity: 0; } }
+.ping-gps { transform-box: fill-box; transform-origin: center; animation: ping-gps 1.6s var(--ease-snap) infinite; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .pop-cek { animation: none; } html:not([data-gerak="penuh"]) .ping-gps { animation: none; opacity: 0; } }
+html[data-gerak="hemat"] .pop-cek { animation: none; }
+html[data-gerak="hemat"] .ping-gps { animation: none; opacity: 0; }
+
+/* Kuis: stempel jawaban jatuh ke kertas (membesar lalu menempel) */
+@keyframes stempel { 0% { opacity: 0; transform: rotate(-14deg) scale(2.4); } 55% { opacity: 1; transform: rotate(-7deg) scale(0.92); } 100% { opacity: 1; transform: rotate(-7deg) scale(1); } }
+.stempel { animation: stempel 380ms var(--ease-snap, cubic-bezier(.2,.8,.2,1)) both; }
+@media (prefers-reduced-motion: reduce) { .stempel { animation: none; transform: rotate(-7deg); } }
+
+/* Kuis: kartu masuk bertahap, baris jawaban menyusul, dan hentakan kecil saat stempel mendarat */
+@keyframes kartu-masuk { from { opacity: 0; transform: translateY(56px) rotate(var(--r0, 10deg)) scale(0.94); } }
+@keyframes baris-masuk { from { opacity: 0; transform: translateX(-26px); } }
+@keyframes hentak { 0%, 100% { translate: 0 0; } 25% { translate: 0 5px; } 50% { translate: 2px -2px; } 75% { translate: -2px 1px; } }
+.kartu-masuk { animation: kartu-masuk 750ms var(--ease-snap, cubic-bezier(.2,.8,.2,1)) both; animation-delay: var(--d, 0ms); }
+.baris-masuk { animation: baris-masuk 520ms var(--ease-snap, cubic-bezier(.2,.8,.2,1)) both; animation-delay: var(--d, 0ms); }
+.hentak { animation: hentak 320ms ease-out 190ms both; }
+@media (prefers-reduced-motion: reduce) { .kartu-masuk, .baris-masuk, .hentak { animation: none; } }
+
+/* Kredit: pita chip berjalan; berhenti saat disorot, statis bila gerak dikurangi */
+@keyframes jalan { to { transform: translateX(-50%); } }
+
+@keyframes api-napas { 50% { transform: scale(1.04) rotate(-2deg); } }
+
+/* Kuis permainan: TORA muncul dari balik bukit, melompat saat jawaban tepat, menggeleng saat belum tepat */
+@keyframes tora-muncul { from { transform: translateY(40%); opacity: 0; } }
+@keyframes tora-loncat { 0%, 100% { transform: translateY(0); } 25% { transform: translateY(-18px) rotate(-2deg); } 50% { transform: translateY(0) scaleY(0.97); } 70% { transform: translateY(-8px); } }
+@keyframes tora-lesu { 15% { transform: rotate(-3deg); } 40% { transform: rotate(3deg); } 65% { transform: rotate(-1.5deg); } 100% { transform: translateY(1.5%) rotate(-1.5deg) scaleY(.975); } }
+@keyframes awan-datang { from { opacity: 0; transform: translateY(-16px) scale(.8); } }
+@keyframes awan-tetes { 0% { opacity: 0; transform: translateY(0); } 25% { opacity: .9; } 100% { opacity: 0; transform: translateY(18px); } }
+@keyframes tora-geleng { 15% { transform: rotate(-3deg); } 40% { transform: rotate(3deg); } 65% { transform: rotate(-2deg); } 85% { transform: rotate(1deg); } }
+@keyframes nyala-pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.tora-muncul { animation: tora-muncul 800ms var(--ease-snap, ease-out) 200ms both; }
+.tora-loncat { animation: tora-loncat 700ms var(--ease-snap, ease-out) both; transform-origin: 50% 100%; }
+.tora-geleng { animation: tora-geleng 600ms ease-in-out both; transform-origin: 50% 100%; }
+.tora-lesu { animation: tora-lesu 1000ms ease-in-out both; transform-origin: 50% 100%; }
+.awan-mendung { animation: awan-datang 500ms var(--ease-snap, ease-out) both; }
+.awan-tetes { animation: awan-tetes 1.15s ease-in infinite; }
+/* Napas diam: TORA naik-turun pelan dan sedikit melebar, seperti bernapas (mulai setelah ia muncul) */
+@keyframes tora-napas { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-6px) scale(1.012, 0.992); } }
+.tora-napas { animation: tora-napas 3.4s ease-in-out 1.1s infinite; transform-origin: 50% 100%; }
+.nyala-pop { animation: nyala-pop 500ms var(--ease-snap, ease-out) both; }
+@media (prefers-reduced-motion: reduce) { .tora-muncul, .tora-loncat, .tora-geleng, .tora-lesu, .awan-mendung, .awan-tetes, .tora-napas, .nyala-pop { animation: none; } }
+html[data-gerak="hemat"] .tora-muncul, html[data-gerak="hemat"] .tora-napas, html[data-gerak="hemat"] .tora-loncat, html[data-gerak="hemat"] .tora-geleng, html[data-gerak="hemat"] .tora-lesu, html[data-gerak="hemat"] .awan-mendung, html[data-gerak="hemat"] .awan-tetes, html[data-gerak="hemat"] .nyala-pop { animation: none; }
+
+/* Halaman Masuk: matahari terbit saat dibuka; formulir bergetar sekali saat kredensial salah. Ikut dimatikan oleh aturan gerak global. */
+@keyframes matahari-terbit { from { transform: translateY(5.5rem); opacity: 0; } }
+.matahari-terbit { animation: matahari-terbit 1.3s var(--ease-snap, ease-out) 150ms backwards; }
+@keyframes getar { 15% { translate: -9px 0; } 35% { translate: 8px 0; } 55% { translate: -5px 0; } 75% { translate: 3px 0; } }
+.getar { animation: getar 420ms var(--ease-snap, ease-out); }
+html[data-gerak="hemat"] .matahari-terbit, html[data-gerak="hemat"] .getar { animation: none; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .matahari-terbit, html:not([data-gerak="penuh"]) .getar { animation: none; } }
+
+html[data-gerak="hemat"] .toast-waktu { display: none; }
+
+/* TORA, Pos Jaga (asisten melayang di pojok kanan bawah): panel tumbuh dari pojoknya, tombol muncul belakangan, TORA bergoyang kecil saat mengetik.
+   Toast naik di atas tombolnya. Semua gerak berulang dimatikan oleh aturan hemat/reduced-motion global di atas. */
+@keyframes tora-buka { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+.tora-panel { transform-origin: 100% 100%; animation: tora-buka 260ms var(--ease-snap) backwards; }
+@keyframes tora-masuk { from { opacity: 0; translate: 0 16px; } }
+.tora-peluncur-masuk { animation: tora-masuk 520ms var(--ease-snap) 700ms backwards; }
+@keyframes tora-intip { 50% { transform: translateY(-4px); } }
+.tora-intip { animation: tora-intip 1.1s ease-in-out infinite; }
+body:has(.tora-peluncur) .tumpuk-toast { bottom: 5.75rem; }
+body:has(.tora-peluncur):has(.ke-atas-tampil) .tumpuk-toast { bottom: 9.75rem; }
+html[data-gerak="hemat"] .tora-panel, html[data-gerak="hemat"] .tora-peluncur-masuk, html[data-gerak="hemat"] .tora-intip { animation: none; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .tora-intip, html:not([data-gerak="penuh"]) .tora-peluncur-masuk { animation: none; } }
+
+/* ===== Patroli hutan (2.5D) =====
+   Lapisan paralaks digeser oleh satu variabel, --x (jarak jalan TORA dalam px), yang diubah dari JavaScript tanpa render ulang React.
+   Makin dekat lapisannya, makin besar pengali geserannya; lantai dimiringkan dengan perspective supaya terasa punya kedalaman. */
+.pt-adegan { --x: 0; container-type: size; position: relative; overflow: hidden; isolation: isolate; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  background: radial-gradient(120% 70% at 78% 66%, #c4682d 0%, rgb(196 104 45 / 0) 62%), linear-gradient(to bottom, #0b1c16 0%, #173a2d 46%, #5b4026 82%, #8a4a22 100%); }
+.pt-lapis { position: absolute; inset-inline: 0; bottom: 0; background-repeat: repeat-x; pointer-events: none; }
+.pt-jauh { height: 46%; bottom: 20%; background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27700%27%20height=%27220%27%20viewBox=%270%200%20700%20220%27%3E%3Cpath%20d=%27M0%20150%20C70%20105%20140%2095%20230%20130%20S380%20165%20450%20115%20S620%2085%20700%20150%20V220%20H0Z%27%20fill=%27%231a3f33%27/%3E%3Cpath%20d=%27M0%20185%20C90%20150%20180%20150%20270%20172%20S430%20195%20520%20160%20S650%20150%20700%20185%20V220%20H0Z%27%20fill=%27%23163429%27/%3E%3C/svg%3E"); background-size: auto 100%; background-position: calc(var(--x) * -0.06px) bottom; opacity: .95; }
+.pt-tengah { height: 70%; bottom: 17%; background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27560%27%20height=%27320%27%20viewBox=%270%200%20560%20320%27%3E%3Crect%20x=%2763%27%20y=%27115%27%20width=%2714%27%20height=%27205%27%20fill=%27%23183c30%27/%3E%3Cellipse%20cx=%2770%27%20cy=%2795%27%20rx=%2762%27%20ry=%2731%27%20fill=%27%231d4d3b%27/%3E%3Cellipse%20cx=%2745.2%27%20cy=%27105%27%20rx=%2734%27%20ry=%2718%27%20fill=%27%23225a45%27/%3E%3Crect%20x=%27208%27%20y=%2780%27%20width=%2714%27%20height=%27240%27%20fill=%27%23183c30%27/%3E%3Cellipse%20cx=%27215%27%20cy=%2760%27%20rx=%2774%27%20ry=%2737%27%20fill=%27%231d4d3b%27/%3E%3Cellipse%20cx=%27185.4%27%20cy=%2770%27%20rx=%2740%27%20ry=%2722%27%20fill=%27%23225a45%27/%3E%3Crect%20x=%27343%27%20y=%27140%27%20width=%2714%27%20height=%27180%27%20fill=%27%23183c30%27/%3E%3Cellipse%20cx=%27350%27%20cy=%27120%27%20rx=%2754%27%20ry=%2727%27%20fill=%27%231d4d3b%27/%3E%3Cellipse%20cx=%27328.4%27%20cy=%27130%27%20rx=%2729%27%20ry=%2716%27%20fill=%27%23225a45%27/%3E%3Crect%20x=%27463%27%20y=%27100%27%20width=%2714%27%20height=%27220%27%20fill=%27%23183c30%27/%3E%3Cellipse%20cx=%27470%27%20cy=%2780%27%20rx=%2768%27%20ry=%2734%27%20fill=%27%231d4d3b%27/%3E%3Cellipse%20cx=%27442.8%27%20cy=%2790%27%20rx=%2737%27%20ry=%2720%27%20fill=%27%23225a45%27/%3E%3C/svg%3E"); background-size: auto 100%; background-position: calc(var(--x) * -0.22px) bottom; }
+.pt-dekat { height: 100%; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27840%27%20height=%27420%27%20viewBox=%270%200%20840%20420%27%3E%3Cpath%20d=%27M124%20420%20C128%20330%20126%20120%20130%200%20H170%20C174%20120%20172%20330%20180%20420%20Z%27%20fill=%27%230e271f%27/%3E%3Cpath%20d=%27M90%20420%20C120%20400%20124%20380%20126%20340%20L180%20340%20C180%20380%20184%20400%20216%20420Z%27%20fill=%27%230e271f%27/%3E%3Crect%20x=%27138%27%20y=%270%27%20width=%275%27%20height=%27400%27%20fill=%27%2317392c%27%20opacity=%27.8%27/%3E%3Cpath%20d=%27M564%20420%20C568%20330%20566%20120%20570%200%20H610%20C614%20120%20612%20330%20620%20420%20Z%27%20fill=%27%230e271f%27/%3E%3Cpath%20d=%27M530%20420%20C560%20400%20564%20380%20566%20340%20L620%20340%20C620%20380%20624%20400%20656%20420Z%27%20fill=%27%230e271f%27/%3E%3Crect%20x=%27578%27%20y=%270%27%20width=%275%27%20height=%27400%27%20fill=%27%2317392c%27%20opacity=%27.8%27/%3E%3C/svg%3E"); background-size: auto 100%; background-position: calc(var(--x) * -0.55px) bottom; opacity: .92; }
+.pt-depan { height: 17%; z-index: 4; background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%27420%27%20height=%27110%27%20viewBox=%270%200%20420%20110%27%3E%3Cpath%20d=%27M0%20110%20L0%2060%20L10%2067%20L19%2070%20L29%2035%20L39%2070%20L46%2072%20L53%2070%20L64%2070%20L75%2070%20L84%2039%20L94%2070%20L101%2044%20L108%2070%20L116%2074%20L125%2070%20L132%2049%20L140%2070%20L150%2072%20L160%2070%20L168%2071%20L177%2070%20L188%2049%20L199%2070%20L206%2024%20L213%2070%20L224%2069%20L236%2070%20L244%2036%20L253%2070%20L265%2039%20L277%2070%20L284%2040%20L291%2070%20L302%2051%20L314%2070%20L321%2062%20L328%2070%20L335%2041%20L342%2070%20L350%2058%20L358%2070%20L368%2067%20L378%2070%20L389%2069%20L400%2070%20L412%2057%20L420%2060%20L420%20110Z%27%20fill=%27%230a211a%27/%3E%3Cpath%20d=%27M0%20110%20L0%2060%20L10%2067%20L19%2070%20L29%2035%20L39%2070%20L46%2072%20L53%2070%20L64%2070%20L75%2070%20L84%2039%20L94%2070%20L101%2044%20L108%2070%20L116%2074%20L125%2070%20L132%2049%20L140%2070%20L150%2072%20L160%2070%20L168%2071%20L177%2070%20L188%2049%20L199%2070%20L206%2024%20L213%2070%20L224%2069%20L236%2070%20L244%2036%20L253%2070%20L265%2039%20L277%2070%20L284%2040%20L291%2070%20L302%2051%20L314%2070%20L321%2062%20L328%2070%20L335%2041%20L342%2070%20L350%2058%20L358%2070%20L368%2067%20L378%2070%20L389%2069%20L400%2070%20L412%2057%20L420%2060%20L420%20110Z%27%20fill=%27%230d2a21%27%20transform=%27translate(0%2014)%27%20opacity=%27.9%27/%3E%3C/svg%3E"); background-size: auto 100%; background-position: calc(var(--x) * -1.25px) bottom; }
+/* Lantai: bidang tanah yang dimiringkan. Garis-garisnya menyempit ke arah cakrawala dan bergeser sesuai langkah TORA. */
+.pt-lantai { position: absolute; inset-inline: 0; bottom: 0; height: 27%; overflow: hidden; perspective: 380px; perspective-origin: 50% -40%; z-index: 1; pointer-events: none; }
+.pt-lantai::before { content: ""; position: absolute; inset: 0 -30% 0; transform-origin: 50% 0; transform: rotateX(58deg);
+  background: repeating-linear-gradient(90deg, #6b4a2c 0 44px, #5c3f25 44px 88px); background-position-x: calc(var(--x) * -1px); }
+.pt-lantai::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, #3a4a2c 0%, rgb(58 74 44 / 0) 45%); }
+.pt-dunia { position: absolute; inset: 0; left: 24%; z-index: 2; transform: translate3d(calc(var(--x) * -1px), 0, 0); will-change: transform; pointer-events: none; }
+.pt-titik { position: absolute; bottom: 11%; width: min(28cqw, 46cqh); translate: -50% 0; }
+.pt-titik svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pt-vinyet { position: absolute; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(130% 100% at 50% 40%, transparent 55%, rgb(4 12 9 / .55) 100%); }
+
+/* TORA: tubuhnya gambar maskot apa adanya; gerak (langkah, napas, loncat) hanya transform pada pembungkusnya. */
+.pt-tora { position: absolute; left: 24%; bottom: 7%; width: min(44cqw, 70cqh); translate: -50% 0; z-index: 3; }
+.pt-tora-langkah { transform-origin: 50% 100%; }
+.pt-adegan[data-jalan="1"] .pt-tora-langkah { animation: pt-langkah .56s ease-in-out infinite; }
+@keyframes pt-langkah { 0%, 100% { transform: translateY(0) rotate(-2deg) scale(1.01, .985); } 25% { transform: translateY(-9px) rotate(1deg) scale(.99, 1.01); } 50% { transform: translateY(0) rotate(2.5deg) scale(1.01, .985); } 75% { transform: translateY(-9px) rotate(-1deg) scale(.99, 1.01); } }
+.pt-bayang { position: absolute; left: 12%; right: 12%; bottom: -3%; height: 9%; border-radius: 50%; background: rgb(0 0 0 / .38); filter: blur(4px); }
+.pt-adegan[data-jalan="1"] .pt-bayang { animation: pt-bayang .56s ease-in-out infinite; }
+@keyframes pt-bayang { 0%, 50%, 100% { scale: 1 1; } 25%, 75% { scale: .86 .9; } }
+.pt-gelembung { position: absolute; z-index: 6; left: calc(24% + min(16cqw, 22cqh)); top: 5%; max-width: min(15rem, 52%); padding: .45rem .8rem; border-radius: 1rem 1rem 1rem .25rem;
+  background: var(--surface); color: var(--text); border: 2px solid var(--line-strong); font-size: .875rem; font-weight: 700; line-height: 1.25; text-wrap: balance; }
+
+/* Titik api: nyala berkobar, asap naik, dan hasilnya terlihat langsung (benar: padam dan bertunas, salah: makin besar). */
+.pt-nyala { transform-box: fill-box; transform-origin: 50% 100%; animation: pt-kobar .8s ease-in-out infinite alternate; transition: scale .6s var(--ease-snap, ease-out), opacity .5s ease; }
+.pt-nyala-dalam { animation-duration: .55s; animation-delay: -.2s; }
+@keyframes pt-kobar { from { transform: scale(1, 1) skewX(-2deg); } to { transform: scale(.93, 1.08) skewX(3deg); } }
+.pt-asap { transform-box: fill-box; transform-origin: 50% 100%; animation: pt-asap 3.2s ease-out infinite; opacity: 0; }
+.pt-asap:nth-of-type(2) { animation-delay: -1.1s; } .pt-asap:nth-of-type(3) { animation-delay: -2.2s; }
+@keyframes pt-asap { 0% { transform: translate(0, 10px) scale(.5); opacity: 0; } 20% { opacity: .55; } 100% { transform: translate(14px, -70px) scale(1.5); opacity: 0; } }
+.pt-denyut { transform-box: fill-box; transform-origin: 50% 50%; animation: pt-denyut 2s ease-out infinite; }
+.pt-denyut:nth-of-type(2) { animation-delay: -1s; }
+@keyframes pt-denyut { from { transform: scale(.35); opacity: .9; } to { transform: scale(1.25); opacity: 0; } }
+.pt-angin-garis { animation: pt-angin 1.3s linear infinite; } .pt-angin-garis:nth-of-type(2) { animation-delay: -.4s; } .pt-angin-garis:nth-of-type(3) { animation-delay: -.85s; }
+@keyframes pt-angin { from { transform: translateX(-14px); opacity: 0; } 30% { opacity: .85; } to { transform: translateX(26px); opacity: 0; } }
+.pt-tunas, .pt-besar { opacity: 0; transition: opacity .5s ease .15s, scale .6s var(--ease-snap, ease-out) .15s; scale: .4; transform-box: fill-box; transform-origin: 50% 100%; }
+.pt-titik[data-hasil="benar"] .pt-nyala, .pt-titik[data-hasil="benar"] .pt-asap, .pt-titik[data-hasil="benar"] .pt-denyut, .pt-titik[data-hasil="benar"] .pt-bara { opacity: 0; scale: .2; animation-play-state: paused; }
+.pt-titik[data-hasil="benar"] .pt-tunas { opacity: 1; scale: 1; }
+.pt-titik[data-hasil="salah"] .pt-nyala { scale: 1.45; }
+.pt-titik[data-hasil="salah"] .pt-besar { opacity: 1; scale: 1; }
+.pt-semak { fill: #1d5a43; } .pt-semak-gelap { fill: #153f31; } .pt-tanah { fill: #2b1f14; } .pt-kayu { stroke: #5a3f27; fill: none; stroke-linecap: round; }
+.pt-orang { fill: #0d1c16; stroke: #b4c7ba; stroke-width: 2.5; } .pt-bara { fill: #ff7a3d; transition: opacity .5s ease, scale .5s ease; }
+@media (prefers-reduced-motion: reduce) { html:not([data-gerak="penuh"]) .pt-nyala, html:not([data-gerak="penuh"]) .pt-asap, html:not([data-gerak="penuh"]) .pt-denyut, html:not([data-gerak="penuh"]) .pt-angin-garis, html:not([data-gerak="penuh"]) .pt-tora-langkah, html:not([data-gerak="penuh"]) .pt-bayang { animation: none !important; } html:not([data-gerak="penuh"]) .pt-asap { opacity: .35; } }
+html[data-gerak="hemat"] .pt-nyala, html[data-gerak="hemat"] .pt-asap, html[data-gerak="hemat"] .pt-denyut, html[data-gerak="hemat"] .pt-angin-garis, html[data-gerak="hemat"] .pt-tora-langkah, html[data-gerak="hemat"] .pt-bayang { animation: none !important; }
+html[data-gerak="hemat"] .pt-asap { opacity: .35; }
+
+/* Kartu ajakan TORA di Edukasi (AjakTora): tiga lapis kedalaman yang bergeser berbeda mengikuti kursor (--px/--py dari JS, -1..1),
+   TORA naik dari bawah kartu saat kartu masuk layar, dan baris pertanyaan terisi oranye menyapu dari kiri saat disorot. */
+.tora-ajak { --px: 0; --py: 0; box-shadow: 0 36px 70px -36px rgb(0 0 0 / .55); }
+.tora-ajak-latar::before { content: ""; position: absolute; inset: 0;
+  background: radial-gradient(58% 80% at 80% 108%, color-mix(in oklab, var(--ember) 36%, transparent), transparent 72%),
+    radial-gradient(42% 55% at 6% -12%, color-mix(in oklab, var(--mint) 16%, transparent), transparent 70%); }
+.tora-kontur { translate: calc(var(--px) * -14px) calc(var(--py) * -10px); transition: translate .6s var(--ease-snap); }
+.tora-sosok { transition: translate .9s var(--ease-snap), opacity .5s ease; }
+.tora-ajak:not([data-tampil]) .tora-sosok { translate: 0 4.5rem; opacity: 0; }
+.tora-sosok-dalam { translate: calc(var(--px) * 9px) calc(var(--py) * 6px); transition: translate .5s var(--ease-snap); }
+.tora-gelembung { translate: calc(var(--px) * 16px) calc(var(--py) * 11px); transition: translate .5s var(--ease-snap), opacity .4s ease .5s, scale .5s var(--ease-snap) .5s; transform-origin: 0 100%; }
+.tora-ajak:not([data-tampil]) .tora-gelembung { opacity: 0; scale: .8; }
+.tora-tanya { background-image: linear-gradient(var(--ember), var(--ember)); background-repeat: no-repeat; background-size: 0% 100%;
+  transition: background-size .5s var(--ease-snap), color .25s ease, border-color .25s ease; }
+.tora-tanya:hover, .tora-tanya:focus-visible { background-size: 100% 100%; color: var(--on-ember); border-color: var(--ember); }
+html[data-gerak="hemat"] .tora-ajak *, html[data-gerak="hemat"] .tora-tanya { transition: none !important; }
+
+/* Kartu bocoran Patroli di Edukasi (KartuPatroli): TORA dan dunia digeser ke kanan agar papan petunjuk di kiri tidak menutupinya.
+   Papan berujung panah (penunjuk arah) di layar lebar. */
+.pt-kartu { --tora-x: 50%; }
+.pt-kartu .pt-dunia, .pt-kartu .pt-tora { left: var(--tora-x); }
+.pt-kartu-tanya { transition: opacity .25s ease; }
+@media (min-width: 640px) { .pt-kartu { --tora-x: 62%; } }
+@media (max-width: 1023.98px) { .pt-kartu .pt-tora { width: min(44cqw, 40cqh); } } /* susunan bertumpuk: TORA tidak boleh setinggi ruang di bawah papan */
+@media (min-width: 1024px) {
+  .pt-kartu { --tora-x: 66%; }
+  .pt-papan { clip-path: polygon(0 0, calc(100% - 1.9rem) 0, 100% 50%, calc(100% - 1.9rem) 100%, 0 100%); }
+}
+
+
+/* ---------- Rumah Siaga (checklist persiapan) ---------- */
+.rumah-siaga .rs-teks { font: 800 11px/1 var(--font-sans, system-ui); letter-spacing: .06em; }
+.rumah-siaga .rs-benda { cursor: pointer; }
+.rumah-siaga .rs-benda > *:not(title) { transform-box: fill-box; }
+/* Butir belum dikerjakan: bayangan putus-putus, jadi terlihat apa yang masih kurang */
+.rumah-siaga .rs-hantu { opacity: .32; }
+.rumah-siaga .rs-hantu :is(rect, path, circle) { fill: transparent !important; stroke: var(--text) !important; stroke-dasharray: 4 4; stroke-width: 2px !important; }
+.rumah-siaga .rs-hantu text { opacity: 0; }
+.rumah-siaga .rs-hantu:hover { opacity: .6; }
+.rumah-siaga .rs-hadir { transition: opacity .3s; }
+.rumah-siaga .rs-baru { animation: rs-muncul .6s var(--ease-snap) both; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes rs-muncul { 0% { opacity: 0; transform: translateY(-14px) scale(.4); } 60% { opacity: 1; transform: translateY(2px) scale(1.12); } 100% { transform: none; } }
+.rumah-siaga .rs-asap { animation: rs-hanyut 9s ease-in-out infinite alternate; }
+.rumah-siaga .rs-asap-2 { animation-duration: 12s; animation-direction: alternate-reverse; }
+@keyframes rs-hanyut { from { transform: translateX(-18px); } to { transform: translateX(22px); } }
+.rumah-siaga .rs-asap-tipis { animation: rs-kepul 2.4s ease-in-out infinite; }
+@keyframes rs-kepul { 0%, 100% { opacity: .35; transform: translateY(0); } 50% { opacity: .9; transform: translateY(-4px); } }
+.rumah-siaga .rs-sinyal { animation: rs-sinyal 1.8s ease-out infinite; }
+@keyframes rs-sinyal { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+.rumah-siaga .rs-garis-jalan { animation: rs-jalan 1.6s linear infinite; }
+@keyframes rs-jalan { to { stroke-dashoffset: -18; } }
+.rumah-siaga .rs-bola { animation: rs-pantul 1.1s var(--ease-snap) infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes rs-pantul { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.rumah-siaga .rs-sorot { animation: rs-sorot 4s linear infinite, rs-sorot-masuk .3s var(--ease-snap) both; pointer-events: none; }
+@keyframes rs-sorot { to { rotate: 360deg; } }
+@keyframes rs-sorot-masuk { from { opacity: 0; scale: .6; } }
+.rumah-siaga .rs-matahari-penuh { animation: rs-matahari 3s ease-in-out infinite; }
+@keyframes rs-matahari { 50% { transform: scale(1.08); } }
+
+/* Stempel tahap selesai (neo-brutal, sedikit miring) */
+@keyframes stempel { 0% { opacity: 0; transform: scale(2.2) rotate(-14deg); } 60% { opacity: 1; transform: scale(.92) rotate(-7deg); } 100% { transform: scale(1) rotate(-6deg); } }
+.stempel-masuk { animation: stempel .5s var(--ease-snap) both; }
+/* Mini game tas siaga */
+@keyframes tolak { 0%, 100% { translate: 0; } 20% { translate: -7px; } 40% { translate: 6px; } 60% { translate: -4px; } 80% { translate: 2px; } }
+.barang-tolak { animation: tolak .4s ease-in-out; }
+@keyframes tas-isi { 0% { transform: translateY(-28px) scale(.6); opacity: 0; } 70% { transform: translateY(3px) scale(1.06); opacity: 1; } 100% { transform: none; } }
+.tas-isi { animation: tas-isi .45s var(--ease-snap) both; }
+@keyframes tas-tutup { 0% { transform: rotate(0); } 30% { transform: rotate(-4deg) scale(1.04); } 60% { transform: rotate(3deg); } 100% { transform: none; } }
+.tas-selesai { animation: tas-tutup .6s var(--ease-snap); }
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-gerak="penuh"]) .rumah-siaga * , html:not([data-gerak="penuh"]) .stempel-masuk, html:not([data-gerak="penuh"]) .barang-tolak, html:not([data-gerak="penuh"]) .tas-isi, html:not([data-gerak="penuh"]) .tas-selesai { animation: none !important; }
+}
+html[data-gerak="hemat"] .rumah-siaga *, html[data-gerak="hemat"] .stempel-masuk, html[data-gerak="hemat"] .barang-tolak, html[data-gerak="hemat"] .tas-isi, html[data-gerak="hemat"] .tas-selesai { animation: none !important; }
+
+/* ===== Lembar Siaga (cetak checklist): A4, warna tetap agar tema gelap tidak ikut tercetak ===== */
+.lembar-cetak { display: none; }
+@media print {
+  @page { size: A4; margin: 10mm 13mm; }
+  html:has(body > .lembar-cetak), body:has(> .lembar-cetak) { background: rgb(255 255 255) !important; }
+  body:has(> .lembar-cetak) > :not(.lembar-cetak) { display: none !important; }
+  .lembar-cetak, .lembar-cetak * { visibility: visible; }
+  .lembar-cetak { display: block; color: rgb(17 24 20); font-size: 9.6pt; line-height: 1.38; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .lembar-cetak h2, .lembar-cetak p { margin: 0; }
+  .lc-kepala { display: flex; justify-content: space-between; align-items: center; padding-bottom: 2.5mm; border-bottom: 2.5pt solid rgb(17 24 20); }
+  .lc-merek { display: inline-flex; align-items: center; gap: 2mm; font-family: var(--font-display, inherit); font-weight: 800; font-size: 12pt; }
+  .lc-merek img { height: 6.5mm; width: auto; }
+  .lc-label { font-family: var(--font-mono, monospace); font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: rgb(178 62 18); }
+  .lc-judul { margin-top: 4mm !important; font-weight: 800; font-family: var(--font-display, inherit); font-size: 20pt; line-height: 1.05; letter-spacing: -.01em; }
+  .lc-sub { margin-top: 1.5mm !important; color: rgb(72 84 77); }
+  .lc-info { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 4mm; }
+  .lc-info section { border: 1.5pt solid rgb(17 24 20); border-radius: 3mm; padding: 3mm 3.5mm 2mm; }
+  .lc-info h2 { font-family: var(--font-mono, monospace); font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: rgb(72 84 77); margin-bottom: 1mm !important; }
+  .lc-baris { display: flex; align-items: flex-end; gap: 2mm; min-height: 6.5mm; }
+  .lc-baris span { white-space: nowrap; }
+  .lc-baris i { flex: 1; border-bottom: .75pt dotted rgb(100 112 105); margin-bottom: 1mm; }
+  .lc-baris.lc-kosong { min-height: 8mm; }
+  .lc-112 b { margin-left: auto; font-size: 15pt; line-height: 1; color: rgb(178 62 18); }
+  .lc-titik { font-weight: 700; font-size: 11pt; padding: 1.5mm 0 1mm; border-bottom: .75pt solid rgb(17 24 20); }
+  .lc-progres { display: flex; align-items: center; gap: 3mm; margin-top: 4mm !important; font-weight: 600; }
+  .lc-kotak-kecil { display: inline-flex; gap: 1mm; }
+  .lc-kotak-kecil i { width: 3mm; height: 3mm; border: .75pt solid rgb(17 24 20); border-radius: .6mm; }
+  .lc-kotak-kecil i.isi { background: rgb(31 107 74); border-color: rgb(31 107 74); }
+  .lc-tahap { margin-top: 3.5mm; break-inside: avoid; }
+  .lc-tahap h2 { display: flex; align-items: baseline; gap: 2.5mm; flex-wrap: wrap; padding-bottom: 1.5mm; border-bottom: 1.5pt solid rgb(17 24 20); font-family: var(--font-display, inherit); font-size: 12.5pt; }
+  .lc-tahap h2 span { font-family: var(--font-mono, monospace); font-size: 8pt; color: rgb(178 62 18); }
+  .lc-tahap h2 small { font-family: inherit; font-weight: 400; font-size: 8.5pt; color: rgb(72 84 77); }
+  .lc-tahap ol { list-style: none; margin: 0; padding: 0; }
+  .lc-tahap li { display: flex; gap: 3mm; padding: 1.5mm 0; border-bottom: .5pt solid rgb(205 210 206); break-inside: avoid; }
+  .lc-kotak { flex: none; display: grid; place-items: center; width: 4.6mm; height: 4.6mm; margin-top: .3mm; border: 1.2pt solid rgb(17 24 20); border-radius: 1mm; font-size: 9pt; font-weight: 800; color: rgb(255 255 255); }
+  .lc-tahap li.cek .lc-kotak { background: rgb(31 107 74); border-color: rgb(31 107 74); }
+  .lc-teks b { font-variant-numeric: tabular-nums; }
+  .lc-kenapa { margin-top: .6mm !important; font-size: 8pt; line-height: 1.35; color: rgb(88 99 93); }
+  .lc-kaki { display: flex; flex-direction: column; gap: .8mm; margin-top: 4mm; padding-top: 2mm; border-top: 1.5pt solid rgb(17 24 20); font-size: 8pt; color: rgb(72 84 77); }
+  .lc-kaki b { font-size: 9.5pt; color: rgb(17 24 20); }
+}
+
+/* ===== Galeri museum ===== */
+.museum-ruang {
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgb(255 236 196 / 0.07), transparent 60%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.018) 0 2px, transparent 2px 46px),
+    linear-gradient(rgb(30 38 33), rgb(22 28 25));
+}
+.museum-lantai { background: linear-gradient(rgb(46 34 26), rgb(30 22 17)); border-top: 3px solid rgb(14 11 9); box-shadow: inset 0 3px 0 rgb(255 255 255 / 0.05); }
+.museum-sorot {
+  clip-path: polygon(41% 0, 59% 0, 100% 100%, 0 100%);
+  background: linear-gradient(rgb(255 238 200 / 0.24), rgb(255 238 200 / 0.08) 70%, transparent);
+  pointer-events: none; mix-blend-mode: screen;
+  animation: lampu-nyala 900ms steps(1, end) both;
+}
+@keyframes lampu-nyala { 0% { opacity: 0 } 18% { opacity: .7 } 26% { opacity: .15 } 40% { opacity: 1 } 100% { opacity: 1 } }
+.pigura { filter: drop-shadow(0 22px 26px rgb(0 0 0 / 0.55)); }
+.pigura-bingkai { padding: clamp(6px, 1.1vw, 14px); border: 3px solid rgb(14 11 9); border-radius: 6px;
+  background: linear-gradient(135deg, rgb(92 64 40), rgb(58 40 26) 45%, rgb(80 55 34)); box-shadow: inset 0 0 0 2px rgb(150 112 66 / 0.6), inset 0 0 0 5px rgb(40 28 18); }
+.pigura-pasparto { padding: clamp(8px, 1.6vw, 18px); background: rgb(242 238 228); box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.25); }
+.pigura-pasparto > div { box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25); }
+.pigura-dari-kanan { animation: pigura-masuk 560ms var(--ease-snap) both; --dari: 48px; }
+.pigura-dari-kiri { animation: pigura-masuk 560ms var(--ease-snap) both; --dari: -48px; }
+@keyframes pigura-masuk { from { opacity: 0; translate: calc(-50% + var(--dari)) 0; } to { opacity: 1; translate: -50% 0; } }
+.titik-gambut { box-shadow: 0 0 0 4px rgb(255 196 84 / 0.35); animation: titik-denyut 2.4s ease-in-out infinite; }
+.titik-gambut[aria-pressed="true"] { animation: none; box-shadow: 0 0 0 4px rgb(28 22 18 / 0.35); }
+@keyframes titik-denyut { 50% { box-shadow: 0 0 0 9px rgb(255 196 84 / 0); } }
+.unsur-redup { animation: unsur-redup 420ms var(--ease-snap) both; }
+@keyframes unsur-redup { from { opacity: 0 } }
+.asap-padam { stroke-dasharray: 90; animation: asap-naik 1.6s ease-out infinite; }
+@keyframes asap-naik { from { stroke-dashoffset: 90; opacity: 1; translate: 0 6px } to { stroke-dashoffset: 0; opacity: 0; translate: 0 -10px } }
+.gelembung-tora { animation: gelembung-muncul 420ms var(--ease-snap) 260ms both; box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5); }
+.gelembung-tora::after { content: ''; position: absolute; left: -11px; top: 22px; width: 18px; height: 18px; background: inherit;
+  border-left: 2px solid rgb(28 22 18); border-bottom: 2px solid rgb(28 22 18); rotate: 45deg; border-bottom-left-radius: 4px; }
+@keyframes gelembung-muncul { from { opacity: 0; translate: 0 8px; scale: .96 } }
+/* Plakat: kartu terang di dinding gelap (token disetel ulang agar kontras tetap aman) */
+.plakat { background: rgb(17 22 19); }
+.plakat-kartu { --text: rgb(28 24 20); --text-2: rgb(84 78 70); --ember-ink: rgb(170 56 14); --canopy: rgb(26 104 70); background: rgb(244 240 230); color: var(--text); }
+/* TORA tampak belakang (foto ilustrasi): bergoyang pelan, melangkah saat pindah ruang */
+.tora-belakang { transform-origin: 50% 100%; animation: tb-amati 6s ease-in-out infinite; filter: drop-shadow(0 -2px 18px rgb(0 0 0 / 0.35)); }
+.tora-belakang.tb-jalan { animation: tb-jalan 260ms ease-in-out 3; }
+@keyframes tb-amati { 0%, 100% { rotate: 0deg } 40% { rotate: 1.6deg } 70% { rotate: -0.8deg } }
+@keyframes tb-jalan { 50% { translate: 0 -8px; rotate: 1deg } }
+@media (prefers-reduced-motion: reduce) {
+  .museum-sorot, .pigura-dari-kanan, .pigura-dari-kiri, .titik-gambut, .asap-padam, .gelembung-tora, .unsur-redup,
+  .tora-belakang, .tora-belakang.tb-jalan { animation: none !important; }
+}
+html[data-gerak="hemat"] :is(.museum-sorot, .pigura-dari-kanan, .pigura-dari-kiri, .titik-gambut, .asap-padam, .gelembung-tora, .unsur-redup, .tora-belakang) { animation: none !important; }
+
+/* ===== Perpustakaan (tab Artikel) ===== */
+.perpus-dinding {
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 120px),
+    linear-gradient(rgb(44 32 24), rgb(34 25 19));
+}
+.rak-label { padding: 3px 10px; border: 2px solid rgb(28 22 18); border-radius: 4px; background: linear-gradient(rgb(214 178 98), rgb(176 138 64));
+  color: rgb(28 22 18); font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 2px 2px 0 rgb(0 0 0 / .45); }
+.rak { scrollbar-width: thin; background: linear-gradient(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.12)); border-inline: 6px solid rgb(70 48 30); }
+.rak-papan { height: 16px; border: 2px solid rgb(18 14 10); border-radius: 2px; background: linear-gradient(rgb(128 88 52), rgb(92 62 36)); box-shadow: 0 6px 0 rgb(0 0 0 / .35); }
+.rak-penyangga { width: 10px; height: 9rem; border: 2px solid rgb(18 14 10); border-radius: 2px 2px 0 0; background: rgb(150 112 66); rotate: 8deg; transform-origin: bottom left; }
+.buku { background:
+    linear-gradient(90deg, rgb(0 0 0 / .28), transparent 18%, rgb(255 255 255 / .08) 40%, transparent 60%, rgb(0 0 0 / .22)),
+    var(--warna);
+  box-shadow: inset 0 10px 0 -7px rgb(232 196 112 / .9), inset 0 -12px 0 -8px rgb(232 196 112 / .9);
+  transition: translate 260ms var(--ease-snap), box-shadow 260ms; cursor: pointer; }
+.buku:hover, .buku:focus-visible { translate: 0 -12px; }
+.buku-dipilih { translate: 0 -22px; outline: 3px solid var(--ember); outline-offset: 2px; }
+.buku-pita { background: rgb(214 52 52); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%); border: 0; }
+.buku-mulai { animation: buku-mulai 1.8s ease-in-out infinite; }
+@keyframes buku-mulai { 50% { translate: -50% -4px; } }
+.perpus-meja { background: radial-gradient(90% 60% at 50% 100%, rgb(255 214 140 / .1), transparent 70%), rgb(30 24 19); }
+.meja-kayu { border: 2px solid rgb(18 14 10); border-radius: 6px 6px 0 0; background: linear-gradient(rgb(140 98 58), rgb(98 66 38)); box-shadow: inset 0 3px 0 rgb(255 255 255 / .12); }
+.gelembung-pustaka { box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5); }
+.meja-baca { background: rgb(26 22 18); }
+/* Buku di meja: sampul membuka ke kiri (3D), memperlihatkan halaman pertama */
+.buku-3d { position: relative; width: 13.5rem; aspect-ratio: 3 / 4.1; perspective: 1400px; }
+.buku-halaman { position: absolute; inset: 0 0 0 6px; padding: 1rem 1rem 1rem 1.4rem; border: 2px solid rgb(18 14 10); border-radius: 2px 8px 8px 2px; background: rgb(246 240 226); color: rgb(28 22 18); box-shadow: 6px 6px 0 rgb(0 0 0 / .45); }
+.buku-sampul { position: absolute; inset: 0; overflow: hidden; border: 2px solid rgb(18 14 10); border-radius: 3px 10px 10px 3px; color: rgb(250 240 222);
+  background: linear-gradient(90deg, rgb(0 0 0 / .35) 0 9px, rgb(255 255 255 / .12) 9px 11px, transparent 11px), var(--warna);
+  transform-origin: left center; transition: transform 700ms var(--ease-snap); backface-visibility: hidden; box-shadow: 6px 6px 0 rgb(0 0 0 / .45); }
+.buku-sampul.terbuka { transform: rotateY(-155deg); }
+.buku-3d:hover .buku-sampul:not(.terbuka) { transform: rotateY(-14deg); }
+/* Kartu pinjam + cap */
+.kartu-pinjam { background: repeating-linear-gradient(rgb(244 238 224) 0 27px, rgb(214 226 236) 27px 28px); color: rgb(28 22 18); }
+.cap-pinjam { display: inline-block; padding: 4px 10px; border: 3px double rgb(186 40 40); border-radius: 6px; color: rgb(176 36 36); rotate: -7deg;
+  font-family: var(--font-mono); font-weight: 800; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; line-height: 1.25; background: rgb(255 255 255 / .35); }
+.cap-masuk { animation: cap-masuk 520ms cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes cap-masuk { 0% { opacity: 0; scale: 2.2; rotate: -18deg; } 60% { opacity: 1; scale: .94; } 100% { scale: 1; rotate: -7deg; } }
+/* Glosarium */
+.istilah-kartu { translate: calc(-50% + var(--geser, 0px)) 0; animation: istilah-muncul 220ms var(--ease-snap) both; }
+@keyframes istilah-muncul { from { opacity: 0; translate: calc(-50% + var(--geser, 0px)) -4px; } }
+/* Widget perumpamaan */
+.pr-jatuh { animation: pr-jatuh 520ms ease-in both; }
+@keyframes pr-jatuh { from { translate: 0 0; } to { translate: 0 44px; opacity: 0; } }
+.pr-nyala { animation: pr-nyala 600ms var(--ease-snap) 420ms both; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes pr-nyala { from { opacity: 0; scale: .4; } }
+.pr-bara { animation: pr-denyut 1.2s ease-in-out infinite; }
+.pr-denyut { animation: pr-denyut 1.2s ease-in-out infinite; }
+@keyframes pr-denyut { 50% { opacity: .55; } }
+.pr-asap { animation: pr-asap 2s ease-out infinite; }
+@keyframes pr-asap { from { opacity: .9; translate: 0 4px; } to { opacity: 0; translate: 0 -14px; } }
+.pr-alir { animation: pr-alir 900ms linear infinite; }
+@keyframes pr-alir { to { stroke-dashoffset: -22; } }
+.pr-pasang { animation: pr-pasang 420ms cubic-bezier(.2, 1.4, .4, 1) both; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes pr-pasang { from { scale: 1 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .buku, .buku-sampul { transition: none; }
+  .buku-mulai, .cap-masuk, .istilah-kartu, .pr-jatuh, .pr-nyala, .pr-bara, .pr-denyut, .pr-asap, .pr-alir, .pr-pasang { animation: none !important; }
+}
+html[data-gerak="hemat"] :is(.buku-mulai, .cap-masuk, .istilah-kartu, .pr-jatuh, .pr-nyala, .pr-bara, .pr-denyut, .pr-asap, .pr-alir, .pr-pasang) { animation: none !important; }
