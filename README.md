@@ -259,6 +259,7 @@ pyraops/
 
 ## 👥 Informasi Tim
 
+| | |
 |---|---|
 | **Nama Project** | PyraOps |
 | **Kategori** | Web Design Competition |
