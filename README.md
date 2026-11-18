@@ -259,11 +259,13 @@ pyraops/
 
 ## 👥 Informasi Tim
 
-**Nama Project:** PyraOps
-**Kategori:** Web Design Competition
-**Kompetisi:** Techno Versary Vol. II
-**Asal Institusi:** UPN "Veteran" Jawa Timur
-**Nama Tim:** Nama Tim (Opsional)
+| | |
+|---|---|
+| **Nama Project** | PyraOps |
+| **Kategori** | Web Design Competition |
+| **Kompetisi** | Techno Versary Vol. II |
+| **Asal Institusi** | UPN "Veteran" Jawa Timur |
+| **Nama Tim** | Nama Tim (Opsional) |
 
 ### Anggota Tim
 
