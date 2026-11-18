@@ -1,5 +1,5 @@
 <div align="center">
-
+<img src="src/assets/maskot/harimau-ceria.webp" alt="TORA, maskot PyraOps" width="140" />
 # 🔥 PyraOps
 
 ### Edukasi dan Simulasi Kebakaran Hutan dan Lahan (Karhutla)
