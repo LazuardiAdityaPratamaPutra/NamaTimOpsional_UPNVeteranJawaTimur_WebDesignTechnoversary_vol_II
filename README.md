@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="src/assets/maskot/harimau-ceria.webp" alt="TORA, maskot PyraOps" width="140" />
-
 # 🔥 PyraOps
 
 ### Edukasi dan Simulasi Kebakaran Hutan dan Lahan (Karhutla)
@@ -43,21 +41,18 @@ Kebanyakan informasi karhutla berhenti pada *"di mana titik apinya"*. PyraOps me
 
 <div align="center">
 
-| Beranda (Terang) | Beranda (Gelap) |
-|:---:|:---:|
-| <img src="docs/screenshots/01-home-terang.jpg" alt="Beranda mode terang" width="420" /> | <img src="docs/screenshots/02-home-gelap.jpg" alt="Beranda mode gelap" width="420" /> |
+### 🌲 Hero 3D Interaktif dan Tampilan Perangkat
+<img src="docs/preview/01-tampilan-3d.png" alt="Tampilan 3D PyraOps pada desktop dan ponsel" width="900" />
 
-| Peta dan Simulasi | Pelaporan Lapangan |
-|:---:|:---:|
-| <img src="docs/screenshots/03-peta-simulasi.jpg" alt="Peta dan simulasi karhutla" width="420" /> | <img src="docs/screenshots/04-lapor.jpg" alt="Halaman lapor" width="420" /> |
+<br /><br />
 
-| Perpustakaan Edukasi | Artikel Edukasi |
-|:---:|:---:|
-| <img src="docs/screenshots/05-edukasi-perpustakaan.jpg" alt="Perpustakaan edukasi" width="420" /> | <img src="docs/screenshots/06-artikel-gambut.jpg" alt="Artikel tentang gambut" width="420" /> |
+### 💻 Tampilan Desktop
+<img src="docs/preview/02-tampilan-desktop.png" alt="Tampilan desktop PyraOps: perpustakaan, peta simulasi, dan halaman tentang" width="900" />
 
-| Galeri | Tampilan Ponsel |
-|:---:|:---:|
-| <img src="docs/screenshots/10-galeri-museum.jpg" alt="Galeri" width="420" /> | <img src="docs/screenshots/09-ponsel-peta.jpg" alt="Tampilan ponsel" width="200" /> |
+<br /><br />
+
+### 📱 Tampilan Mobile
+<img src="docs/preview/03-tampilan-mobile.png" alt="Tampilan mobile PyraOps: pahami, prediksi, laporkan" width="900" />
 
 </div>
 
@@ -270,10 +265,10 @@ pyraops/
 
 ### Anggota Tim
 
-| Nama | Tanggung Jawab |
-|---|---|
-| Muhamad Musyaffa' Hadzaz Zaman | UI, Peta, dan Simulasi |
-| Lazuardi Aditya Pratama Putra | PWA, AI, dan Konten |
+| Anggota | Peran | GitHub |
+|---|---|---|
+| Muhamad Musyaffa' Hadzaz Zaman | UI, peta, dan simulasi | [@MusHdzmn](https://github.com/MusHdzmn) |
+| Lazuardi Aditya Pratama Putra | PWA, AI, dan konten | [@LazuardiAdityaPratamaPutra](https://github.com/LazuardiAdityaPratamaPutra) |
 
 ### Kontak
 
